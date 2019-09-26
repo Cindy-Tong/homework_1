@@ -2,6 +2,8 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from sklearn import cluster
+from sklearn.cluster import MeanShift
+from sklearn import preprocessing
 from sklearn import datasets
 from sklearn import metrics
 from sklearn import mixture
@@ -19,6 +21,7 @@ print(digits.keys())
 
 print(digits.images[1796])
 print(digits.target[1796])
+n_digits = len(np.unique(digits.target))
 
 X=scale(digits.data)#标准化处理数据集，将每个属性的分布改为均值为0，标准差为1
 x_compress=PCA(n_components=2).fit_transform(X)#数据集降为二维，用X来训练PCA模型，同时返回降维后的数据。
@@ -46,7 +49,16 @@ evaluate(y_true,y_pred,'AffinityPropafation')
 plt.subplot(332).set_title('AffinityPropafation')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
+clf = MeanShift(bandwidth=1)
+y_pred = clf.fit_predict(preprocessing.scale(X))
+evaluate(y_true,y_pred,'MeanShift')
+plt.subplot(333).set_title('MeanShift');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
+y_pred = cluster.SpectralClustering(n_clusters=n_digits, affinity='nearest_neighbors').fit_predict(X)
+evaluate(y_true,y_pred,'SpectralClustering')
+plt.subplot(334).set_title('SpectralClustering');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 print('-' * 50)
 plt.show()
