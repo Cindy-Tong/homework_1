@@ -10,11 +10,6 @@ from sklearn import mixture
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
 
-from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import Normalizer
-
 digits = datasets.load_digits()
 print(digits.keys())
 #dict_keys(['data', 'target', 'target_names', 'images', 'DESCR'])
@@ -58,6 +53,22 @@ plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 y_pred = cluster.SpectralClustering(n_clusters=n_digits, affinity='nearest_neighbors').fit_predict(X)
 evaluate(y_true,y_pred,'SpectralClustering')
 plt.subplot(334).set_title('SpectralClustering');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
+
+clst=cluster.AgglomerativeClustering(n_clusters=n_digits,affinity="euclidean",linkage='ward')
+y_pred = clst.fit_predict(X)
+evaluate(y_true,y_pred,'AgglomerativeClustering')
+plt.subplot(335).set_title('AgglomerativeClustering');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
+
+y_pred = cluster.DBSCAN(eps = 4, min_samples = 4).fit_predict(X)
+evaluate(y_true,y_pred,'DBSCAN')
+plt.subplot(336).set_title('DBSCAN')
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
+
+y_pred = mixture.GaussianMixture(n_components=10).fit_predict(X)
+evaluate(y_true,y_pred,'GaussianMixture')
+plt.subplot(337).set_title('GaussianMixture')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 print('-' * 50)
