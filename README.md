@@ -104,3 +104,5 @@ plt.show()
 ```
 
 评估结果如下所示：  
+![Image_text](https://github.com/Cindy-Tong/homework_1/blob/master/image-folder/digits.PNG)  
+![Image_text](https://github.com/Cindy-Tong/homework_1/blob/master/image-folder/digits_images.PNG)
