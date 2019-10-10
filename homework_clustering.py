@@ -31,13 +31,13 @@ def evaluate(labels_true,labels_pred,name):
     ))
 
 print('-'*50)
-print('%-20s\t%s\t%s\t%s'%('','NMI','HOMO','COMP'))
+print('%-20s\t%s\t%s\t%s'%('',' NMI',' HOMO',' COMP'))
 plt.figure(figsize=(10, 10))#自定义画布大小
 
 y_pred = cluster.KMeans(n_clusters=10,random_state=9).fit_predict(X)
 evaluate(y_true,y_pred,'k-means')
 plt.subplot(331).set_title('k-means')
-plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)#s为点的大小，c为点的颜色
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred*100)#s为点的大小，c为点的颜色
 
 y_pred = cluster.AffinityPropagation().fit_predict(X)
 evaluate(y_true,y_pred,'AffinityPropafation')
@@ -57,18 +57,27 @@ plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 clst=cluster.AgglomerativeClustering(n_clusters=n_digits,affinity="euclidean",linkage='ward')
 y_pred = clst.fit_predict(X)
-evaluate(y_true,y_pred,'AgglomerativeClustering')
-plt.subplot(335).set_title('AgglomerativeClustering');
+evaluate(y_true,y_pred,'WardHierarchical')
+plt.subplot(335).set_title('WardHierarchical')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
-y_pred = cluster.DBSCAN(eps = 4, min_samples = 4).fit_predict(X)
+i = 0
+for linkage in ('average','complete'):
+    clst = cluster.AgglomerativeClustering(linkage=linkage,n_clusters=n_digits,affinity='canberra')
+    y_pred = clst.fit_predict(X)
+    evaluate(y_true,y_pred,linkage+'Agglomerative')
+    plt.subplot(336+i).set_title(linkage+'Agglomerative')
+    i = i+1
+    plt.scatter(x_compress[:, 0], x_compress[:, 1], c=y_pred)
+
+y_pred = cluster.DBSCAN(eps = 4.3, min_samples = 6).fit_predict(X)
 evaluate(y_true,y_pred,'DBSCAN')
-plt.subplot(336).set_title('DBSCAN')
+plt.subplot(338).set_title('DBSCAN')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 y_pred = mixture.GaussianMixture(n_components=10).fit_predict(X)
 evaluate(y_true,y_pred,'GaussianMixture')
-plt.subplot(337).set_title('GaussianMixture')
+plt.subplot(339).set_title('GaussianMixture')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 print('-' * 50)
