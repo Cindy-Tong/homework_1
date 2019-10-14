@@ -10,25 +10,19 @@ from sklearn import mixture
 from sklearn.decomposition import PCA
 from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import Normalizer
-from sklearn.feature_extraction.text import CountVectorizer
+
 categories = [
     'alt.atheism',
     'talk.religion.misc',
+    'rec.motorcycles',
     'comp.graphics',
     'sci.space',
 ]
-newsdata = datasets.fetch_20newsgroups(subset='all', categories=categories,
-                                   shuffle=True, random_state=42)
 
-vectorizer = TfidfVectorizer(max_df=0.5, max_features=10000,
-                                 min_df=2, stop_words='english',
-                                 use_idf=True)
+newsdata = datasets.fetch_20newsgroups(subset='all', categories=categories)
+vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(newsdata.data)
-svd = TruncatedSVD(2)
-normalizer = Normalizer(copy=False)
-lsa = make_pipeline(svd, normalizer)
+lsa = TruncatedSVD(2)
 X = lsa.fit_transform(X)
 x_compress = PCA(n_components=2).fit_transform(X)
 y_true = newsdata.target
@@ -69,18 +63,30 @@ plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 clst=cluster.AgglomerativeClustering(n_clusters=true_k,affinity="euclidean",linkage='ward')
 y_pred = clst.fit_predict(X)
-evaluate(y_true,y_pred,'AgglomerativeClustering')
-plt.subplot(335).set_title('AgglomerativeClustering');
+evaluate(y_true,y_pred,'WardAgglomerative')
+plt.subplot(335).set_title('WardAgglomerative');
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
-y_pred = cluster.DBSCAN(eps = 0.01, min_samples = 4).fit_predict(X)
+clst=cluster.AgglomerativeClustering(n_clusters=true_k,affinity="canberra",linkage='average')
+y_pred = clst.fit_predict(X)
+evaluate(y_true,y_pred,'AverageAgglomerative')
+plt.subplot(336).set_title('AverageAgglomerative');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
+
+clst=cluster.AgglomerativeClustering(n_clusters=true_k,affinity="canberra",linkage='complete')
+y_pred = clst.fit_predict(X)
+evaluate(y_true,y_pred,'CompleteAgglomerative')
+plt.subplot(337).set_title('CompleteAgglomerative');
+plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
+
+y_pred = cluster.DBSCAN(eps = 0.005, min_samples = 2).fit_predict(X)
 evaluate(y_true,y_pred,'DBSCAN')
-plt.subplot(336).set_title('DBSCAN')
+plt.subplot(338).set_title('DBSCAN')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 y_pred = mixture.GaussianMixture(n_components=true_k).fit_predict(X)
 evaluate(y_true,y_pred,'GaussianMixture')
-plt.subplot(337).set_title('GaussianMixture')
+plt.subplot(339).set_title('GaussianMixture')
 plt.scatter(x_compress[:,0],x_compress[:,1],c=y_pred)
 
 print('-' * 50)
